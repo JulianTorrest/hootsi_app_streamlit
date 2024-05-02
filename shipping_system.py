@@ -109,9 +109,6 @@ warehouse_locations = {
     "Tulsa": {"address": "4040 Oak St, Tulsa, OK", "inventory": {...}},
 }
 
-# Visualización de la aplicación
-st.title("Logistics Application")
-
 # Función para seleccionar un producto del catálogo
 def select_product(product_catalog):
     st.subheader("Select a Product")
@@ -126,11 +123,62 @@ def select_location(warehouse_locations):
     selected_location = st.selectbox("Choose a Location", location_names)
     return selected_location
 
+# Función para seleccionar la cantidad de productos
+def select_quantity():
+    st.subheader("Select Quantity")
+    quantity = st.number_input("Enter Quantity", min_value=1, value=1)
+    return quantity
+
+# Función para calcular el subtotal
+def calculate_subtotal(price, quantity):
+    return price * quantity
+
+# Función para calcular el total con impuestos y envío
+def calculate_total(subtotal):
+    tax_rate = 0.08  # Tasa de impuesto del 8%
+    shipping_cost = 10  # Costo de envío fijo
+    total = subtotal * (1 + tax_rate) + shipping_cost
+    return total
+
+# Función para mostrar la pantalla de confirmación del pedido
+def show_confirmation(product, price, quantity, subtotal, total):
+    st.subheader("Order Confirmation")
+    st.write("You have selected the following product:")
+    st.write("Product:", product)
+    st.write("Price per Item: $", price)
+    st.write("Quantity:", quantity)
+    st.write("Subtotal: $", subtotal)
+    st.write("Total (incl. tax and shipping): $", total)
+
+    st.subheader("Shipping Details")
+    name = st.text_input("Name", "")
+    address = st.text_area("Address", "")
+    city = st.text_input("City", "")
+    postal_code = st.text_input("Postal Code", "")
+
+    if st.button("Confirm Order"):
+        st.write("Your order has been confirmed!")
+        st.write("Shipping Details:")
+        st.write("Name:", name)
+        st.write("Address:", address)
+        st.write("City:", city)
+        st.write("Postal Code:", postal_code)
+
 # Función principal
 def main():
     product = select_product(product_catalog)
     location = select_location(warehouse_locations)
-    st.write("You selected:", product, "located in", location)
+    quantity = select_quantity()
+
+    for item in product_catalog:
+        if item["name"] == product:
+            price = item["price"]
+            description = item["description"]
+
+    subtotal = calculate_subtotal(price, quantity)
+    total = calculate_total(subtotal)
+
+    show_confirmation(product, price, quantity, subtotal, total)
 
 # Ejecución de la función principal
 if __name__ == "__main__":
